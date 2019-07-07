@@ -329,9 +329,12 @@ function create() {
       tempCoin = state.coins.create(Random(state.currentMonster.x - 60, state.currentMonster.x + 60), state.currentMonster.y + 30, 'golden_coin' )
       
       // tempCoin.goldValue = Math.round(state.world.level * 1.43 * Random(1,1.4));
-      tempCoin.goldValue = (state.world.level % 5 == 0) ? 
+      var noIdea = state.world.level.toString()
+      noIdea = noIdea[noIdea.length-1]
+      var isBoss = (noIdea == '4' || noIdea == '9') && state.world.killed == 9 ? true : false;
+      tempCoin.goldValue = isBoss ? 
         Math.round(Math.pow(state.world.level, 1.14) * state.player.bossKilled + 1 * Random(1.3,1.5)) :
-       Math.round(Math.pow(state.world.level, 1.14) * state.player.bossKilled + 1 * Random(1,1.2));
+        Math.round(Math.pow(state.world.level, 1.14) * state.player.bossKilled + 1 * Random(1,1.2));
       
       tempCoin.setInteractive();
       // state.time.addEvent(Phaser.Timer.SECOND * 3, onClickCoin, this, tempCoin);
