@@ -248,7 +248,6 @@ function create() {
   }
 
   loadGame();
-  console.log(upgradeButtonsData)
   
   // preload upgrades
   upgradeButtonsData.forEach(function(item){
