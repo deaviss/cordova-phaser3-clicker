@@ -75,12 +75,11 @@ function create() {
   }
 
   
-
+  // player's attributes
   this.player = {
     clickDmg: 1,
     clickDmgBonus: 0,
     gold: 0,
-    dps: 1,
     dpsSources: [],
     bossKilled: 0
   };
@@ -91,9 +90,13 @@ function create() {
     toKill: 10
   }
 
+  if(this.gameConfig.debug){
+    window.player = this.player;
+  }
   
 
   var state = this;
+  // used for console.log in debug mode
   function log(txt) {
     if(state.gameConfig.debug)
       console.log(txt)
@@ -142,7 +145,7 @@ function create() {
   ];
 
   var upgradeButtonsData = [
-    {icon: 'dagger', name: 'Attack', level: 1, cost: 10, value: 1, boost: 1, 
+    {icon: 'dagger', name: 'Attack', level: 1, cost: 10, value: 1, boost: 1, isVisible: true, 
     stats:[
       {
         level: 25,
@@ -160,7 +163,7 @@ function create() {
       });
       state.player.clickDmg = this.level * this.boost
     }},
-    {icon: 'swordIcon1', name: 'Auto-Attack', level: 0, cost: 25, value: 2, boost: 1,
+    {icon: 'swordIcon1', name: 'Auto-Attack', level: 0, cost: 25, value: 2, boost: 1, isVisible: true,
     stats:[
       {
         level: 25,
@@ -179,8 +182,14 @@ function create() {
       var _this = this;
       var dps = state.player.dpsSources.filter(function(el) { return el.name==_this.name})
       dps[0].dmg = this.value * this.level * this.boost
+      var index = upgradeButtonsData.findIndex(function(e) { return e.name == _this.name })
+      index += 1
+      if(this.level >= 5 && upgradeButtonsData[index].isVisible == false) {
+        upgradeButtonsData[index].isVisible = true;
+        recreateMenu();
+      }
     }},
-    {icon: 'swordIcon2', name: 'Auto-Attack 2', level: 0, cost: 400, value: 8, boost: 1,
+    {icon: 'swordIcon2', name: 'Auto-Attack 2', level: 0, cost: 400, value: 8, boost: 1, isVisible: false,
     stats:[
       {
         level: 25,
@@ -199,8 +208,14 @@ function create() {
       var _this = this;
       var dps = state.player.dpsSources.filter(function(el) { return el.name==_this.name})
       dps[0].dmg = this.value * this.level * this.boost
+      var index = upgradeButtonsData.findIndex(function(e) { return e.name == _this.name })
+      index += 1
+      if(this.level >= 5 && upgradeButtonsData[index].isVisible == false) {
+        upgradeButtonsData[index].isVisible = true;
+        recreateMenu();
+      }
     }},
-    {icon: 'swordIcon3', name: 'Auto-Attack 3', level: 0, cost: 1500, value: 18, boost: 1, 
+    {icon: 'swordIcon3', name: 'Auto-Attack 3', level: 0, cost: 1500, value: 18, boost: 1, isVisible: false,
     stats:[
       {
         level: 25,
@@ -221,7 +236,9 @@ function create() {
       dps[0].dmg = this.value * this.level * this.boost
     }}
   ];
-
+  
+  window.upgrades = upgradeButtonsData;
+  
   // preload
   upgradeButtonsData.forEach(function(item){
     var getAdjustedCost = function () {
@@ -333,8 +350,8 @@ function create() {
       noIdea = noIdea[noIdea.length-1]
       var isBoss = (noIdea == '4' || noIdea == '9') && state.world.killed == 9 ? true : false;
       tempCoin.goldValue = isBoss ? 
-        Math.round(Math.pow(state.world.level, 1.14) * state.player.bossKilled + 1 * Random(1.3,1.5)) :
-        Math.round(Math.pow(state.world.level, 1.14) * state.player.bossKilled + 1 * Random(1,1.2));
+        Math.round(Math.pow(state.world.level, 1.14) * state.player.bossKilled + 1 * Random(2,2.1)) :
+        Math.round(Math.pow(state.world.level, 1.14) * state.player.bossKilled + 1 * Random(1.4,1.5));
       
       tempCoin.setInteractive();
       // state.time.addEvent(Phaser.Timer.SECOND * 3, onClickCoin, this, tempCoin);
@@ -481,7 +498,7 @@ function create() {
 
   var createMenu = function() {
 		var scrollMode = 0; // 0:vertical, 1:horizontal
-		var gridTable = state.rexUI.add.gridTable({
+		state.gridTable = state.rexUI.add.gridTable({
 			x: 0,
 			y: 640,
 			width: 540,
@@ -501,7 +518,7 @@ function create() {
 					padding: 2,
 				},
 
-				reuseCellContainer: true,
+				reuseCellContainer: false,
 			},
 
 			// slider: {
@@ -564,18 +581,22 @@ function create() {
         // cellContainer.getElement('icon').setFillStyle(0x0); // Set fill color of round rectangle object
         return cellContainer;
 			},
-			items: upgradeButtonsData
+			items: upgradeButtonsData.filter(function(e){return e.isVisible == true})
 		}).setOrigin(0,0)
 			.layout()
 				//.drawBounds(state.add.graphics(), 0xff0000);
 
-		gridTable
+		state.gridTable
 		.on('cell.click', function (cellContainer, cellIndex) {
       onUpgradeClick(cellIndex)
-      gridTable.refresh();
+      state.gridTable.refresh();
 		}, state)
 	}
-	createMenu();
+  createMenu();
+  window.zob = state.gridTable;
+  function recreateMenu(){
+    state.gridTable.setItems(upgradeButtonsData.filter(function(e){return e.isVisible == true}))
+  }
 
   var createUi = function(){
     
