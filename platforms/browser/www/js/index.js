@@ -145,106 +145,133 @@ function create() {
   ];
 
   var upgradeButtonsData = [
-    {icon: 'dagger', name: 'Attack', level: 1, cost: 10, value: 1, boost: 1, isVisible: true, 
-    stats:[
-      {
-        level: 25,
-        boost: 1.25
-      },
-      {
-        level: 50,
-        boost: 1.5
-      }
-    ], purchaseHandler: function() {
-      this.stats.forEach(e => {
-        if(this.level == e.level){
-          this.boost = e.boost;
+    {
+      icon: 'dagger', name: 'Attack', level: 1, cost: 10, value: 1, boost: 1, isVisible: true, 
+      stats:[
+        {
+          level: 25,
+          boost: 1.25
+        },
+        {
+          level: 50,
+          boost: 1.5
+        },
+        {
+          level: 75,
+          boost: 2.25
+        },
+        {
+          level: 100,
+          boost: 3
         }
-      });
-      state.player.clickDmg = this.level * this.boost
-    }},
-    {icon: 'swordIcon1', name: 'Auto-Attack', level: 0, cost: 25, value: 2, boost: 1, isVisible: true,
-    stats:[
-      {
-        level: 25,
-        boost: 1.25
-      },
-      {
-        level: 50,
-        boost: 1.5
-      }
-    ], purchaseHandler: function() {
-      this.stats.forEach(e => {
-        if(this.level == e.level){
-          this.boost = e.boost;
-        }
-      });
-      var _this = this;
-      var dps = state.player.dpsSources.filter(function(el) { return el.name==_this.name})
-      dps[0].dmg = this.value * this.level * this.boost
-      var index = upgradeButtonsData.findIndex(function(e) { return e.name == _this.name })
-      index += 1
-      if(this.level >= 5 && upgradeButtonsData[index].isVisible == false) {
-        upgradeButtonsData[index].isVisible = true;
-        recreateMenu();
-      }
-    }},
-    {icon: 'swordIcon2', name: 'Auto-Attack 2', level: 0, cost: 400, value: 8, boost: 1, isVisible: false,
-    stats:[
-      {
-        level: 25,
-        boost: 1.25
-      },
-      {
-        level: 50,
-        boost: 1.5
-      }
-    ], purchaseHandler: function() {
-      this.stats.forEach(e => {
-        if(this.level == e.level){
-          this.boost = e.boost;
-        }
-      });
-      var _this = this;
-      var dps = state.player.dpsSources.filter(function(el) { return el.name==_this.name})
-      dps[0].dmg = this.value * this.level * this.boost
-      var index = upgradeButtonsData.findIndex(function(e) { return e.name == _this.name })
-      index += 1
-      if(this.level >= 5 && upgradeButtonsData[index].isVisible == false) {
-        upgradeButtonsData[index].isVisible = true;
-        recreateMenu();
-      }
-    }},
-    {icon: 'swordIcon3', name: 'Auto-Attack 3', level: 0, cost: 1500, value: 18, boost: 1, isVisible: false,
-    stats:[
-      {
-        level: 25,
-        boost: 1.25
-      },
-      {
-        level: 50,
-        boost: 1.5
-      }
-    ], purchaseHandler: function() {
-      this.stats.forEach(e => {
-        if(this.level == e.level){
-          this.boost = e.boost;
-        }
-      });
-      var _this = this;
-      var dps = state.player.dpsSources.filter(function(el) { return el.name==_this.name})
-      dps[0].dmg = this.value * this.level * this.boost
-    }}
+      ], purchaseHandler: function() {
+        this.stats.forEach(e => {
+          if(this.level == e.level){
+            this.boost = e.boost;
+          }
+        });
+        state.player.clickDmg = this.level * this.boost
+      }},
   ];
+
+  function createUpgrade(icon, name, cost, value, stats, isVisible = false){
+    var newUpgrade = {};
+    newUpgrade.icon = icon;
+    newUpgrade.name = name;
+    newUpgrade.cost = cost
+    newUpgrade.value = value;
+    newUpgrade.stats = stats;
+
+    newUpgrade.isVisible = isVisible;
+    newUpgrade.level = 0;
+    newUpgrade.boost = 1;
+
+    upgradeButtonsData.push(newUpgrade)
+  }
+
+  function fillUpgrades(){
+      createUpgrade('swordIcon1', 'Auto-Attack', 25, 2.5, [{
+        level: 25,
+        boost: 1.25
+      }, {
+        level: 50,
+        boost: 1.5
+      }], true)
+      
+      createUpgrade('swordIcon2', 'Auto-Attack 2', 200, 9, [{
+        level: 25,
+        boost: 1.25
+      }, {
+        level: 50,
+        boost: 1.5
+      }])
+      createUpgrade('swordIcon1', 'Auto-Attack', 900, 15, [{
+        level: 25,
+        boost: 1.25
+      }, {
+        level: 50,
+        boost: 1.5
+      }])
+  }
+
+  fillUpgrades();
+
+  function loadGame() {
+    var player = localStorage.getItem('player');
+    var world = localStorage.getItem('world');
+    var upgrades = localStorage.getItem('upgrades');
+    
+    if(localStorage.getItem('player'))
+      state.player = JSON.parse(player);
+    
+    if(localStorage.getItem('world')){
+      state.world = JSON.parse(world);
+      state.world.killed = 0
+    }
+    
+    if(localStorage.getItem('upgrades')){
+      var upgr = JSON.parse(upgrades);
+      window.upgr = upgr;
+      for(i=0; i < upgr.length - 1; i++){
+        var u = upgradeButtonsData[i];
+        u.level = upgr[i].level;
+        u.boost = upgr[i].boost;
+        u.cost = upgr[i].cost;
+        u.icon = upgr[i].icon;
+        u.isVisible = upgr[i].isVisible;
+        u.name = upgr[i].name;
+        u.stats = upgr[i].stats;
+        u.value = upgr[i].value;
+      }
+    }
+    
+  }
+
+  loadGame();
+  console.log(upgradeButtonsData)
   
-  window.upgrades = upgradeButtonsData;
-  
-  // preload
+  // preload upgrades
   upgradeButtonsData.forEach(function(item){
     var getAdjustedCost = function () {
       if(item.level == 0 || (item.name == 'Attack' && item.level == 1))
         return item.cost;
       return Math.ceil(item.cost * Math.pow(1.11, item.level))
+    }
+    if(item.name != 'Attack')
+    item.purchaseHandler = function(){
+      item.stats.forEach(e => {
+        if(item.level == e.level){
+          item.boost = e.boost;
+        }
+      });
+      var dps = state.player.dpsSources.filter(function(el) { return el.name==item.name})
+      dps[0].dmg = item.value * item.level * item.boost
+      var index = upgradeButtonsData.findIndex(function(e) { return e.name == item.name })
+      index += 1
+      if(index < upgradeButtonsData.length &&  item.level >= 5 && upgradeButtonsData[index].isVisible == false) {
+        upgradeButtonsData[index].isVisible = true;
+        recreateMenu();
+      }
     }
     state.player.dpsSources.push({
       name: item.name,
@@ -252,6 +279,9 @@ function create() {
     });
     item.costText = `Cost: ${numFormat(getAdjustedCost())}`
   })
+
+  
+  
   
 
 
@@ -300,8 +330,16 @@ function create() {
           onRevivedMonster(state.currentMonster);
         })
     });
-    var rand = Random(0, state.monsters.getChildren().length -1);
-    state.currentMonster = state.monsters.getChildren()[0];
+    var noIdea = state.world.level.toString()
+    noIdea = noIdea[noIdea.length-1]
+    var isBoss = (noIdea == '4' || noIdea == '9') && state.world.killed == 9 ? true : false;
+    // pick a new monster
+    var monsterPool = state.monsters.getChildren().filter(function(m) { 
+      if(m.details.minLvl -1 <= state.world.level && state.world.level <= m.details.maxLvl)
+        return isBoss ? m.details.boss == true : m.details.boss == false;
+    })
+    var rand = Random(0, monsterPool.length - 1);
+    state.currentMonster = monsterPool[rand];
     //this.currentMonster.position.set(this.game.world.centerX + 100, this.game.world.centerY);
     state.currentMonster.setPosition(state.currentMonster.defaultPos.x, state.currentMonster.defaultPos.y)
   }
@@ -350,8 +388,8 @@ function create() {
       noIdea = noIdea[noIdea.length-1]
       var isBoss = (noIdea == '4' || noIdea == '9') && state.world.killed == 9 ? true : false;
       tempCoin.goldValue = isBoss ? 
-        Math.round(Math.pow(state.world.level, 1.14) * state.player.bossKilled + 1 * Random(2,2.1)) :
-        Math.round(Math.pow(state.world.level, 1.14) * state.player.bossKilled + 1 * Random(1.4,1.5));
+        Math.round(Math.pow(state.world.level, 1.21) * Math.pow(state.player.bossKilled + 1, 2) * Random(2,2.1)) :
+        Math.round(Math.pow(state.world.level, 1.21) * Math.pow(state.player.bossKilled + 1, 2) * Random(1.4,1.5));
       
       tempCoin.setInteractive();
       // state.time.addEvent(Phaser.Timer.SECOND * 3, onClickCoin, this, tempCoin);
@@ -423,7 +461,7 @@ function create() {
     if(isBoss)
       createCoin(Random(6,9))
     else
-      createCoin(Random(1,6));
+      createCoin(Random(1,3));
   }
   var createDmgText = function() {
     state.dmgTextPool = state.add.group();
@@ -560,10 +598,10 @@ function create() {
 						height: height,
 
 						orientation: scrollMode,
-						background: scene.rexUI.add.roundRectangle(0, 0, 20, 20, 0).setStrokeStyle(2, COLOR_DARK),
+						background: scene.rexUI.add.roundRectangle(0, 0, 20, 20, 2).setStrokeStyle(2, COLOR_DARK),
             // icon: scene.rexUI.add.roundRectangle(0, 0, 20, 20, 10, 0x0),
             icon: scene.add.image(0,0, item.icon),
-						text: scene.add.text(0, 0, ''),
+            text: scene.add.text(0, 0, ''),
 
 						// inside-cell spacing
 						space: {
@@ -571,8 +609,8 @@ function create() {
 							left: 15,
 							top: 0,
 						}
-					});
-				} 
+          });
+        }
 
         // Set properties from item value
         // console.log(cellContainer)
@@ -593,7 +631,6 @@ function create() {
 		}, state)
 	}
   createMenu();
-  window.zob = state.gridTable;
   function recreateMenu(){
     state.gridTable.setItems(upgradeButtonsData.filter(function(e){return e.isVisible == true}))
   }
@@ -604,7 +641,7 @@ function create() {
     // playerInfo background
     state.playerInfoBG = createRectangle(0,0,state.sys.game.config.width, 50, 0x42f58a, 0.8)
       // player info
-    state.playerGold = state.add.text(0, 8, `Gold: ${state.player.gold}`, {
+    state.playerGold = state.add.text(0, 8, 'Gold: ' + numFormat(state.player.gold), {
       font: '32px Arial Black',
       fill: '#fff',
     } )
@@ -645,10 +682,21 @@ function create() {
 
   
 
+  function saveGame() {
+    localStorage.setItem('player', JSON.stringify(state.player))
+    localStorage.setItem('world', JSON.stringify(state.world))
+    localStorage.setItem('upgrades', JSON.stringify(upgradeButtonsData))
+  }
   
   
+  var savingTimer = this.time.addEvent({delay: 1000, callback: saveGame, callbackScope: this, loop: true})
+  
+  
+  window.loadGame = loadGame;
+  window.saveGame = saveGame;
 
 }
+
 
 
 

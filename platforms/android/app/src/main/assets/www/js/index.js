@@ -1,4 +1,7 @@
-
+const COLOR_PRIMARY = 0x4e342e;
+const COLOR_LIGHT = 0x7b5e57;
+const COLOR_DARK = 0x260e04;
+const Random = Phaser.Math.Between;
 let config = {
   type: Phaser.CANVAS,
   width: 540,
@@ -15,285 +18,492 @@ let config = {
 };
 
 function preload(){
-  var progressBar = this.add.graphics();
-		var progressBox = this.add.graphics();
-		progressBox.fillStyle(0x222222, 0.8);
-		progressBox.fillRect(240, 270, 320, 50);
-		
-		var width = this.cameras.main.width;
-		var height = this.cameras.main.height;
-		var loadingText = this.make.text({
-				x: width / 2,
-				y: height / 2 - 50,
-				text: 'Loading...',
-				style: {
-						font: '20px monospace',
-						fill: '#ffffff'
-				}
-		});
-		loadingText.setOrigin(0.5, 0.5);
-		
-		var percentText = this.make.text({
-				x: width / 2,
-				y: height / 2 - 5,
-				text: '0%',
-				style: {
-						font: '18px monospace',
-						fill: '#ffffff'
-				}
-		});
-		percentText.setOrigin(0.5, 0.5);
-		
-		var assetText = this.make.text({
-				x: width / 2,
-				y: height / 2 + 50,
-				text: '',
-				style: {
-						font: '18px monospace',
-						fill: '#ffffff'
-				}
-		});
+  
+  this.load.scenePlugin({
+		key: 'rexuiplugin',
+		url: 'plugins/rexuiplugin.min.js',
+		sceneKey: 'rexUI'
+	});  
+  // bg
+  this.load.image('forest-back', 'img/parallax-forest-back-trees.png');
+  this.load.image('forest-lights', 'img/parallax-forest-lights.png');
+  this.load.image('forest-middle', 'img/parallax-forest-middle-trees.png');
+  this.load.image('forest-front', 'img/parallax-forest-front-trees.png');
+  
+  this.load.image('mountain-bg', 'img/parallax-mountain-bg.png');
+  this.load.image('mountain-front', 'img/parallax-mountain-foreground-trees.png');
+  this.load.image('mountain-mountain1', 'img/parallax-mountain-montain-far.png');
+  this.load.image('mountain-mountain2', 'img/parallax-mountain-mountains.png');
+  this.load.image('mountain-trees', 'img/parallax-mountain-trees.png');
+  // monsters
+  this.load.spritesheet('skl1', 'img/enemies/skeleton.png', { frameWidth: 64, frameHeight: 128 })
 
-		assetText.setOrigin(0.5, 0.5);
-		
-		this.load.on('progress', function (value) {
-				percentText.setText(parseInt(value * 100) + '%');
-				progressBar.clear();
-				progressBar.fillStyle(0xffffff, 1);
-				progressBar.fillRect(250, 280, 300 * value, 30);
-		});
-		
-		this.load.on('fileprogress', function (file) {
-				assetText.setText('Loading asset: ' + file.key);
-		});
-
-		this.load.on('complete', function () {
-				progressBar.destroy();
-				progressBox.destroy();
-				loadingText.destroy();
-				percentText.destroy();
-				assetText.destroy();
-		});
-		this.load.image('forest-back', 'img/parallax-forest-back-trees.png');
-		this.load.image('forest-lights', 'img/parallax-forest-lights.png');
-		this.load.image('forest-middle', 'img/parallax-forest-middle-trees.png');
-		this.load.image('forest-front', 'img/parallax-forest-front-trees.png');
-		// monsters
-		this.load.spritesheet('skl1', 'img/enemies/skeleton.png', { frameWidth: 64, frameHeight: 128 })
-
-		this.load.spritesheet('aerocephal', 'img/enemies/aerocephal.png', { frameWidth: 192, frameHeight: 192 })
-    this.load.spritesheet('arcana_drake', 'img/enemies/arcana_drake.png', { frameWidth: 192, frameHeight: 256 })
-    this.load.spritesheet('aurum-drakueli', 'img/enemies/aurum-drakueli.png', { frameWidth: 320, frameHeight: 256 })
-    this.load.spritesheet('bat', 'img/enemies/bat.png', { frameWidth: 128, frameHeight: 128 })
-    this.load.spritesheet('daemarbora', 'img/enemies/daemarbora.png', { frameWidth: 128, frameHeight: 128 })
-    this.load.spritesheet('deceleon', 'img/enemies/deceleon.png', { frameWidth: 256, frameHeight: 256 })
-    this.load.spritesheet('demonic_essence', 'img/enemies/demonic_essence.png', { frameWidth: 128, frameHeight: 192 })
-    this.load.spritesheet('dune_crawler', 'img/enemies/dune_crawler.png', { frameWidth: 64, frameHeight: 64 })
-    this.load.spritesheet('green_slime', 'img/enemies/green_slime.png', { frameWidth: 64, frameHeight: 64 })
-    this.load.spritesheet('nagaruda', 'img/enemies/nagaruda.png', { frameWidth: 192, frameHeight: 256 })
-    this.load.spritesheet('rat', 'img/enemies/rat.png', { frameWidth: 64, frameHeight: 64 })
-    this.load.spritesheet('scorpion', 'img/enemies/scorpion.png', { frameWidth: 64, frameHeight: 64 })
-    this.load.spritesheet('skeleton', 'img/enemies/skeleton.png', { frameWidth: 64, frameHeight: 128 })
-    this.load.spritesheet('snake', 'img/enemies/snake.png', { frameWidth: 128, frameHeight: 64 })
-    this.load.spritesheet('spider', 'img/enemies/spider.png', { frameWidth: 64, frameHeight: 64 })
-		this.load.spritesheet('stygian_lizard', 'img/enemies/stygian_lizard.png', { frameWidth: 192, frameHeight: 192 })
-    
-    this.load.image('dagger', 'img/items/W_Dagger001.png');
-    this.load.image('swordIcon1', 'img/items/S_Sword15.png');
-    // coin
-    this.load.image('golden_coin', 'img/items/I_GoldCoin.png')
+  this.load.spritesheet('aerocephal', 'img/enemies/aerocephal.png', { frameWidth: 192, frameHeight: 192 })
+  this.load.spritesheet('arcana_drake', 'img/enemies/arcana_drake.png', { frameWidth: 192, frameHeight: 256 })
+  this.load.spritesheet('aurum-drakueli', 'img/enemies/aurum-drakueli.png', { frameWidth: 320, frameHeight: 256 })
+  this.load.spritesheet('bat', 'img/enemies/bat.png', { frameWidth: 128, frameHeight: 128 })
+  this.load.spritesheet('daemarbora', 'img/enemies/daemarbora.png', { frameWidth: 128, frameHeight: 128 })
+  this.load.spritesheet('deceleon', 'img/enemies/deceleon.png', { frameWidth: 256, frameHeight: 256 })
+  this.load.spritesheet('demonic_essence', 'img/enemies/demonic_essence.png', { frameWidth: 128, frameHeight: 192 })
+  this.load.spritesheet('dune_crawler', 'img/enemies/dune_crawler.png', { frameWidth: 64, frameHeight: 64 })
+  this.load.spritesheet('green_slime', 'img/enemies/green_slime.png', { frameWidth: 64, frameHeight: 64 })
+  this.load.spritesheet('nagaruda', 'img/enemies/nagaruda.png', { frameWidth: 192, frameHeight: 256 })
+  this.load.spritesheet('rat', 'img/enemies/rat.png', { frameWidth: 64, frameHeight: 64 })
+  this.load.spritesheet('scorpion', 'img/enemies/scorpion.png', { frameWidth: 64, frameHeight: 64 })
+  this.load.spritesheet('skeleton', 'img/enemies/skeleton.png', { frameWidth: 64, frameHeight: 128 })
+  this.load.spritesheet('snake', 'img/enemies/snake.png', { frameWidth: 128, frameHeight: 64 })
+  this.load.spritesheet('spider', 'img/enemies/spider.png', { frameWidth: 64, frameHeight: 64 })
+  this.load.spritesheet('stygian_lizard', 'img/enemies/stygian_lizard.png', { frameWidth: 192, frameHeight: 192 })
+  
+  this.load.image('dagger', 'img/items/W_Dagger001.png');
+  this.load.image('swordIcon1', 'img/items/S_Sword15.png');
+  this.load.image('swordIcon2', 'img/items/S_Sword16.png');
+  this.load.image('swordIcon3', 'img/items/S_Sword17.png');
+  this.load.image('swordIcon4', 'img/items/S_Sword18.png');
+  this.load.image('swordIcon5', 'img/items/S_Sword19.png');
+  this.load.image('swordIcon6', 'img/items/S_Sword20.png');
+  this.load.image('swordIcon7', 'img/items/S_Sword21.png');
+  // coin
+  this.load.image('golden_coin', 'img/items/I_GoldCoin.png')
 }
 
 function create() {
+
+  this.gameConfig = {
+    displayHitText: true,
+    debug: true
+  }
+
+  
+  // player's attributes
   this.player = {
     clickDmg: 1,
     clickDmgBonus: 0,
     gold: 0,
-    dps: 1,
+    dpsSources: [],
+    bossKilled: 0
   };
 
   this.world = {
-    level: 0,
+    level: 1,
     killed: 0,
     toKill: 10
   }
 
+  if(this.gameConfig.debug){
+    window.player = this.player;
+  }
   
 
   var state = this;
+  // used for console.log in debug mode
+  function log(txt) {
+    if(state.gameConfig.debug)
+      console.log(txt)
+  }
+  var bgMove = function(bg, index){
+    index += 0.1;
+    bg.tilePositionX += 0.5 * (index * 0.7);
+  }
+
+  function createBackground(){
+    state.background = state.add.group();
+    // ['forest-back', 'forest-lights', 'forest-middle', 'forest-front']
+    ['mountain-bg', 'mountain-mountain1', 'mountain-mountain2', 'mountain-trees', 'mountain-front']
+    .forEach(function(image, index) {
+        var bg = state.add.tileSprite(0, 0, state.sys.game.config.width,
+          state.sys.game.config.height - 315, image, '', state.background);
+        bg.setTileScale(2.5,4)
+        bg.setOrigin(0,0)
+        var x = state.time.addEvent({delay: 50, callback: bgMove, args: [bg, index], callbackScope: this, loop: true})
+    });
+  }
+  createBackground();
   
 
-  this.background = this.add.group();
-  ['forest-back', 'forest-lights', 'forest-middle', 'forest-front']
-  .forEach(function(image) {
-      var bg = state.add.tileSprite(0, 0, state.sys.game.config.width,
-        state.sys.game.config.height, image, '', state.background);
-      bg.setTileScale(4,6)
-      bg.setOrigin(0,0)
-  });
+  
+
+  
 		
   var monsterData = [
-    {name: 'Aerocephal',        image: 'aerocephal',        maxHealth: 10},
-    {name: 'Arcana Drake',      image: 'arcana_drake',      maxHealth: 20},
-    {name: 'Aurum Drakueli',    image: 'aurum-drakueli',    maxHealth: 30},
-    {name: 'Bat',               image: 'bat',               maxHealth: 5},
-    {name: 'Daemarbora',        image: 'daemarbora',        maxHealth: 10},
-    {name: 'Deceleon',          image: 'deceleon',          maxHealth: 10},
-    {name: 'Demonic Essence',   image: 'demonic_essence',   maxHealth: 15},
-    {name: 'Dune Crawler',      image: 'dune_crawler',      maxHealth: 8},
-    {name: 'Green Slime',       image: 'green_slime',       maxHealth: 3},
-    {name: 'Nagaruda',          image: 'nagaruda',          maxHealth: 13},
-    {name: 'Rat',               image: 'rat',               maxHealth: 2},
-    {name: 'Scorpion',          image: 'scorpion',          maxHealth: 2},
-    {name: 'Skeleton',          image: 'skeleton',          maxHealth: 6},
-    {name: 'Snake',             image: 'snake',             maxHealth: 4},
-    {name: 'Spider',            image: 'spider',            maxHealth: 4},
-    {name: 'Stygian Lizard',    image: 'stygian_lizard',    maxHealth: 20}
+    {name: 'Rat',               image: 'rat',               maxHealth: 10,  boss: false, minLvl: 0,  maxLvl: 10},
+    {name: 'Scorpion',          image: 'scorpion',          maxHealth: 10,  boss: false, minLvl: 0,  maxLvl: 10},
+    {name: 'Green Slime',       image: 'green_slime',       maxHealth: 14,  boss: false, minLvl: 0,  maxLvl: 10},
+    {name: 'Snake',             image: 'snake',             maxHealth: 14,  boss: false, minLvl: 4,  maxLvl: 10},
+    {name: 'Spider',            image: 'spider',            maxHealth: 19,  boss: false, minLvl: 4,  maxLvl: 14},
+    {name: 'Bat',               image: 'bat',               maxHealth: 19,  boss: false, minLvl: 4,  maxLvl: 14},
+    {name: 'Skeleton',          image: 'skeleton',          maxHealth: 28,  boss: false, minLvl: 8,  maxLvl: 18},
+    {name: 'Dune Crawler',      image: 'dune_crawler',      maxHealth: 28,  boss: false, minLvl: 8,  maxLvl: 18},
+    {name: 'Daemarbora',        image: 'daemarbora',        maxHealth: 28, boss: false, minLvl: 8,  maxLvl: 18},
+    {name: 'Deceleon',          image: 'deceleon',          maxHealth: 36, boss: false, minLvl: 11, maxLvl: 21},
+    {name: 'Aerocephal',        image: 'aerocephal',        maxHealth: 36, boss: false, minLvl: 11, maxLvl: 21},
+    {name: 'Nagaruda',          image: 'nagaruda',          maxHealth: 36, boss: false, minLvl: 11, maxLvl: 21},
+    {name: 'Demonic Essence',   image: 'demonic_essence',   maxHealth: 40, boss: false, minLvl: 16, maxLvl: 100},
+    {name: 'Arcana Drake',      image: 'arcana_drake',      maxHealth: 30, boss: true,  minLvl: 5,  maxLvl: 10},
+    {name: 'Stygian Lizard',    image: 'stygian_lizard',    maxHealth: 50, boss: true,  minLvl: 15, maxLvl: 16},
+    {name: 'Aurum Drakueli',    image: 'aurum-drakueli',    maxHealth: 70, boss: true,  minLvl: 20, maxLvl: 100}
   ];
 
   var upgradeButtonsData = [
-    {icon: 'dagger', name: 'Attack', level: 1, cost: 5, purchaseHandler: function(button, player) {
-      state.player.clickDmg += 1;
-    }},
-    {icon: 'swordIcon1', name: 'Auto-Attack', level: 0, cost: 25, purchaseHandler: function(button, player) {
-      state.player.dps += 5;
-    }}
+    {
+      icon: 'dagger', name: 'Attack', level: 1, cost: 10, value: 1, boost: 1, isVisible: true, 
+      stats:[
+        {
+          level: 25,
+          boost: 1.25
+        },
+        {
+          level: 50,
+          boost: 1.5
+        },
+        {
+          level: 75,
+          boost: 2.25
+        },
+        {
+          level: 100,
+          boost: 3
+        }
+      ], purchaseHandler: function() {
+        this.stats.forEach(e => {
+          if(this.level == e.level){
+            this.boost = e.boost;
+          }
+        });
+        state.player.clickDmg = this.level * this.boost
+      }},
   ];
 
-  
+  function createUpgrade(icon, name, cost, value, stats, isVisible = false){
+    var newUpgrade = {};
+    newUpgrade.icon = icon;
+    newUpgrade.name = name;
+    newUpgrade.cost = cost
+    newUpgrade.value = value;
+    newUpgrade.stats = stats;
 
+    newUpgrade.isVisible = isVisible;
+    newUpgrade.level = 0;
+    newUpgrade.boost = 1;
 
-  this.monsters = this.add.group();
+    upgradeButtonsData.push(newUpgrade)
+  }
 
-  
-  var monster;
-  monsterData.forEach(function(data) {
-      // create a sprite for them off screen
-      monster = state.monsters.create(1000, state.sys.game.config.height / 2, data.image);
-      // reference to the database
-      monster.details = data;
-      monster.displayWidth = 128;
-      monster.displayHeight = 128;
-      monster.alive = true;
-      monster.defaultPos = {
-        x: state.sys.game.config.width / 2 + 50,
-        y: state.sys.game.config.height / 2
-      }
-      monster.setOrigin(0.5,0.5);
-      monster.setInteractive();
-      monster.damage = function(amount){
-        if(this.health <= amount){
-          this.health = 0;
-          this.emit('killed')
-          
-        }else
-          this.health -= amount;
-      }
-      monster.revive = function(){
-        this.emit('revived')
-      }
-      //enable input so we can click it!
-      monster.inputEnabled = true;
-      monster.on('pointerdown', function() {
-        onClickMonster();
-      })
-
-      // use the built in health component
-      monster.health = monster.maxHealth = data.maxHealth;
+  function fillUpgrades(){
+      createUpgrade('swordIcon1', 'Auto-Attack', 25, 2.5, [{
+        level: 25,
+        boost: 1.25
+      }, {
+        level: 50,
+        boost: 1.5
+      }], true)
       
-      // hook into health and lifecycle events
-      monster.on('killed', function() {
-        onKilledMonster(state.currentMonster);
-      })
-      monster.on('revived', function() {
-        onRevivedMonster(state.currentMonster);
-      })
-  });
+      createUpgrade('swordIcon2', 'Auto-Attack 2', 200, 9, [{
+        level: 25,
+        boost: 1.25
+      }, {
+        level: 50,
+        boost: 1.5
+      }])
+      createUpgrade('swordIcon1', 'Auto-Attack', 900, 15, [{
+        level: 25,
+        boost: 1.25
+      }, {
+        level: 50,
+        boost: 1.5
+      }])
+  }
 
-  var rand = Phaser.Math.RND.between(0, this.monsters.getChildren().length -1);
-  this.currentMonster = this.monsters.getChildren()[rand];
-  //this.currentMonster.position.set(this.game.world.centerX + 100, this.game.world.centerY);
-  this.currentMonster.setPosition(this.currentMonster.defaultPos.x, this.currentMonster.defaultPos.y)
+  fillUpgrades();
+
+  function loadGame() {
+    var player = localStorage.getItem('player');
+    var world = localStorage.getItem('world');
+    var upgrades = localStorage.getItem('upgrades');
+    
+    if(localStorage.getItem('player'))
+      state.player = JSON.parse(player);
+    
+    if(localStorage.getItem('world')){
+      state.world = JSON.parse(world);
+      state.world.killed = 0
+    }
+    
+    if(localStorage.getItem('upgrades')){
+      var upgr = JSON.parse(upgrades);
+      window.upgr = upgr;
+      for(i=0; i < upgr.length - 1; i++){
+        var u = upgradeButtonsData[i];
+        u.level = upgr[i].level;
+        u.boost = upgr[i].boost;
+        u.cost = upgr[i].cost;
+        u.icon = upgr[i].icon;
+        u.isVisible = upgr[i].isVisible;
+        u.name = upgr[i].name;
+        u.stats = upgr[i].stats;
+        u.value = upgr[i].value;
+      }
+    }
+    
+  }
+
+  loadGame();
+  console.log(upgradeButtonsData)
+  
+  // preload upgrades
+  upgradeButtonsData.forEach(function(item){
+    var getAdjustedCost = function () {
+      if(item.level == 0 || (item.name == 'Attack' && item.level == 1))
+        return item.cost;
+      return Math.ceil(item.cost * Math.pow(1.11, item.level))
+    }
+    if(item.name != 'Attack')
+    item.purchaseHandler = function(){
+      item.stats.forEach(e => {
+        if(item.level == e.level){
+          item.boost = e.boost;
+        }
+      });
+      var dps = state.player.dpsSources.filter(function(el) { return el.name==item.name})
+      dps[0].dmg = item.value * item.level * item.boost
+      var index = upgradeButtonsData.findIndex(function(e) { return e.name == item.name })
+      index += 1
+      if(index < upgradeButtonsData.length &&  item.level >= 5 && upgradeButtonsData[index].isVisible == false) {
+        upgradeButtonsData[index].isVisible = true;
+        recreateMenu();
+      }
+    }
+    state.player.dpsSources.push({
+      name: item.name,
+      dmg: 0
+    });
+    item.costText = `Cost: ${numFormat(getAdjustedCost())}`
+  })
+
+  
+  
+  
+
+
+  function createMonster(){
+    state.monsters = state.add.group();
+    var monster;
+    monsterData.forEach(function(data) {
+        // create a sprite for them off screen
+        monster = state.monsters.create(1000, state.sys.game.config.height / 2, data.image);
+        // reference to the database
+        monster.details = data;
+        monster.displayWidth = 254;
+        monster.displayHeight = 254;
+        monster.alive = true;
+        monster.defaultPos = {
+          x: state.sys.game.config.width / 2 ,
+          y: state.sys.game.config.height / 3 + 25
+        }
+        monster.setOrigin(0.5,0.5);
+        monster.setInteractive();
+        monster.damage = function(amount){
+          if(this.health <= amount){
+            this.health = 0;
+            this.emit('killed')
+            
+          }else
+            this.health -= amount;
+        }
+        monster.revive = function(){
+          this.emit('revived')
+        }
+        //enable input so we can click it!
+        monster.inputEnabled = true;
+        monster.on('pointerdown', function() {
+          onClickMonster();
+        })
+  
+        // use the built in health component
+        monster.health = monster.maxHealth = data.maxHealth;
+        
+        // hook into health and lifecycle events
+        monster.on('killed', function() {
+          onKilledMonster(state.currentMonster);
+        })
+        monster.on('revived', function() {
+          onRevivedMonster(state.currentMonster);
+        })
+    });
+    var noIdea = state.world.level.toString()
+    noIdea = noIdea[noIdea.length-1]
+    var isBoss = (noIdea == '4' || noIdea == '9') && state.world.killed == 9 ? true : false;
+    // pick a new monster
+    var monsterPool = state.monsters.getChildren().filter(function(m) { 
+      if(m.details.minLvl -1 <= state.world.level && state.world.level <= m.details.maxLvl)
+        return isBoss ? m.details.boss == true : m.details.boss == false;
+    })
+    var rand = Random(0, monsterPool.length - 1);
+    state.currentMonster = monsterPool[rand];
+    //this.currentMonster.position.set(this.game.world.centerX + 100, this.game.world.centerY);
+    state.currentMonster.setPosition(state.currentMonster.defaultPos.x, state.currentMonster.defaultPos.y)
+  }
+  createMonster();
+  
   
   // this.monsterDisplayName = this.add.text(this.sys.game.config.width / 2,
   // 	this.sys.game.config.height / 2 + 100,
   // 	`${this.currentMonster.details.name} - ${this.currentMonster.health}/${this.currentMonster.maxHealth}`, { fill: '#0f0'})
   
   var onPlayerDps = function() {
-    if (state.player.dps > 0) {
+    var dps = 0;
+    state.player.dpsSources.forEach(item => {
+      dps += item.dmg;
+    });
+    if (dps > 0) {
       if (state.currentMonster && state.currentMonster.alive) {
-          var dmg = state.player.dps / 10;
-          state.currentMonster.damage(dmg);
-          // update the health text
-          state.monsterHPText.text = state.currentMonster.alive ? Math.round(state.currentMonster.health) + ' HP' : 'DEAD';
+        var dmg = dps / 10;
+        state.currentMonster.damage(dmg);
+        // update the health text
+        state.monsterHPText.text = state.currentMonster.alive ? numFormat(Math.round(state.currentMonster.health)) + ' HP' : 'DEAD';
       }
     }
   }
   var x = this.time.addEvent({delay: 100, callback: onPlayerDps, callbackScope: this, loop: true})
-  console.log(x);
   
   
   this.coins = this.add.group();
   var onClickCoin = function(c) {
     if(!c.active) return;
     state.player.gold += c.goldValue;
-    state.playerGold.text = `Gold: ${state.player.gold}`
-    
+    state.playerGold.text = `Gold: ${numFormat(state.player.gold)}`
     c.destroy();
   }
   var createCoin = function(amt){
-    
-    console.log('coin')
     for(i=0; i < amt; i++){
       var tempCoin;
-      console.log('coin'+amt)
-      tempCoin = state.coins.create(Phaser.Math.RND.between(state.currentMonster.x-50, state.currentMonster.x+70), state.sys.game.config.height / 2 + 100, 'golden_coin' )
-      tempCoin.goldValue = Math.round(this.level * 1.33);;
+      
+      var rndX = Random(state.currentMonster.x - 100,state.currentMonster.x + 100);
+      var rndY = Random(state.currentMonster.y, state.currentMonster.y - 100)
+      var moveLeft = rndX >= state.currentMonster.x ? true : false
+      tempCoin = state.coins.create(Random(state.currentMonster.x - 60, state.currentMonster.x + 60), state.currentMonster.y + 30, 'golden_coin' )
+      
+      // tempCoin.goldValue = Math.round(state.world.level * 1.43 * Random(1,1.4));
+      var noIdea = state.world.level.toString()
+      noIdea = noIdea[noIdea.length-1]
+      var isBoss = (noIdea == '4' || noIdea == '9') && state.world.killed == 9 ? true : false;
+      tempCoin.goldValue = isBoss ? 
+        Math.round(Math.pow(state.world.level, 1.21) * state.player.bossKilled + 1 * Random(2,2.1)) :
+        Math.round(Math.pow(state.world.level, 1.21) * state.player.bossKilled + 1 * Random(1.4,1.5));
+      
       tempCoin.setInteractive();
       // state.time.addEvent(Phaser.Timer.SECOND * 3, onClickCoin, this, tempCoin);
       state.time.addEvent({delay: 3000, callback: onClickCoin, args: [tempCoin], callbackScope: this})
-      tempCoin.on('pointerdown', function() { onClickCoin(this); console.log(this) })
+      tempCoin.on('pointerdown', function() { onClickCoin(this); })
+      
+      state.coinPool = state.add.group();
+      var coinData = {
+        targets: tempCoin,
+        props: {
+          x: { value: moveLeft == true ? Random(state.currentMonster.x - 180, state.currentMonster.x) : Random(state.currentMonster.x, state.currentMonster.x + 180), 
+            duration: 3500, 
+            ease: 'Power3' },
+          y: { value: state.currentMonster.y + 160, 
+            duration: 1300, 
+            ease: 'Bounce.easeOut' }
+        },
+        duration: 200,
+        ease: 'Bounce',
+      }
+      tempCoin.tween = state.tweens.add(coinData)
     }
   }
   
 
 
   var onClickMonster = function() {
-    // reset the currentMonster before we move him
-    console.log('click')
-    
-    
-    //state.monsterDisplayName.text = `${state.currentMonster.details.name} - ${state.currentMonster.health}/${state.currentMonster.maxHealth}`
-  
+    if(state.gameConfig.displayHitText)
+      createDmgText();
     state.currentMonster.damage(state.player.clickDmg);
-    state.monsterHPText.text = state.currentMonster.alive ? state.currentMonster.health + ' HP' : 'DEAD';
+    state.monsterHPText.text = state.currentMonster.alive ? numFormat(Math.round(state.currentMonster.health)) + ' HP' : 'DEAD';
   }
   var onKilledMonster = function(monster) {
     // move the monster off screen again
-    monster.setPosition(1000, state.sys.game.config.height / 2);
-    console.log('zabity')
-    
+    monster.setPosition(2000, state.sys.game.config.height / 2);
+    var noIdea = state.world.level.toString()
+    noIdea = noIdea[noIdea.length-1]
+    var isBoss = (noIdea == '4' || noIdea == '9') && state.world.killed == 9 ? true : false;
     // pick a new monster
-    var rand = Phaser.Math.RND.between(0, state.monsters.getChildren().length -1);
-    state.currentMonster = state.monsters.getChildren()[rand];
+    var monsterPool = state.monsters.getChildren().filter(function(m) { 
+      if(m.details.minLvl -1 <= state.world.level && state.world.level <= m.details.maxLvl)
+        return isBoss ? m.details.boss == true : m.details.boss == false;
+    })
+    
+    // var rand = Random(0, state.monsters.getChildren().length -1);
+    var rand = Random(0, monsterPool.length - 1);
+    state.currentMonster = monsterPool[rand];
+    var maxHp = isBoss ? 
+     Math.ceil(state.currentMonster.details.maxHealth + (Random( (Math.pow(state.world.level, 1.45)),(Math.pow(state.world.level, 1.55)) ) * Math.pow(state.player.bossKilled + 1, 1.33) * Random(6,7))) :
+     Math.ceil(state.currentMonster.details.maxHealth + (Random( (Math.pow(state.world.level, 1.45)),(Math.pow(state.world.level, 1.55)) ) * Math.pow(state.player.bossKilled, 1.33) * Random(3,4)));
+
+    state.currentMonster.maxHealth = maxHp;
     // make sure they are fully healed
     state.currentMonster.revive(state.currentMonster.maxHealth);
-
+    
     state.world.killed ++;
     if (state.world.killed >= state.world.toKill) {
       state.world.level++;
       state.world.killed = 0;
     }
+    if(isBoss){
+      state.world.toKill = 1;
+      state.player.bossKilled += 1;
+    }else 
+      state.world.toKill = 10;
+    state.worldLevelUI.text = `Level: ${state.world.level}`;
+    state.worldProgressUI.text = `Killed: ${state.world.killed}/${state.world.toKill}`
 
-    createCoin(Phaser.Math.RND.between(2,4));
+    if(isBoss)
+      createCoin(Random(6,9))
+    else
+      createCoin(Random(1,6));
   }
+  var createDmgText = function() {
+    state.dmgTextPool = state.add.group();
+    var dmgText;
+    dmgText = state.add.text(state.input.x, state.input.y, numFormat(state.player.clickDmg), {
+      font: '48px Arial Black',
+      fill: '#ffad6e',
+      strokeThickness: 4
+    }).setOrigin(0.5,0.5);
+    var dmgData = {
+      targets: dmgText,
+      x: Math.ceil(Random(state.currentMonster.x - 100,state.currentMonster.x + 100)),
+      y: Random(state.input.y - 50, state.input.y - 100),
+      duration: 700,
+      ease: 'Cubic.easeOut',
+      alpha: 0.02,
+      onComplete: function(){
+        // ee[0].visible = false
+        // state.dmgTextPool.kill();
+        dmgText.destroy();
+      },
+      onStart: function(e,ee){
+        // dmgText.visible = true;
+        ee[0].visible = true
+      }
+    }
+    // dmgText.visible = false;
+    // start out not existing, so we don't draw it yet
+    dmgText.tween = state.tweens.add(dmgData)
+    // dmgText.tween.stop();
+    state.dmgTextPool.add(dmgText);
+  
+  }
+
+  
+
   var onRevivedMonster = function(monster){
-    console.log('ozywiony')
     state.currentMonster.setPosition(state.currentMonster.defaultPos.x, state.currentMonster.defaultPos.y)
     // update the text display
     state.currentMonster.health = state.currentMonster.maxHealth;
     state.monsterNameTxt.text = monster.details.name;
-    state.monsterHealthText.text = monster.health + 'HP';
+    state.monsterHealthText.text = numFormat(state.currentMonster.health) + 'HP';
   }
 
   var createRectangle = function(x,y,w,h,color, alpha = 1,cb = null){
@@ -304,65 +514,159 @@ function create() {
     return graphics;
   }
 
-  onUpgradeButtonClick = function (button) {
-    if (state.player.gold - button.details.cost >= 0) {
-      state.player.gold -= button.details.cost;
-      state.playerGold.text = 'Gold: ' + state.player.gold;
-      button.details.level++;
-      button.text.text = button.details.name + ': ' + button.details.level;
-      button.details.purchaseHandler.call(state, button, state.player);
+  
+
+  var onUpgradeClick = function(index){
+    var item = upgradeButtonsData[index];
+    var getAdjustedCost = function () {
+      if(item.level == 0 || (item.name == 'Attack' && item.level == 1))
+        return item.cost;
+      return Math.ceil(item.cost * Math.pow(1.11, item.level))
     }
+    if (state.player.gold >= getAdjustedCost()) {
+      state.player.gold -= getAdjustedCost();
+      state.playerGold.text = 'Gold: ' + numFormat(state.player.gold);
+      item.level++;
+      item.purchaseHandler();
+    }
+    item.costText = `Cost: ${numFormat(getAdjustedCost())}`
+    upgradeButtonsData[index] = item;
   }
 
-  var createUpgrades = function() {
-    // state.upgrade1 = createRectangle(15,90, 140, 50, 0xf54296, 0.5)
-    // state.upgrade1.on('pointerdown', function() {console.log('upgrade1')})
 
-    var button;
-    upgradeButtonsData.forEach(function(buttonData, index) {
-        // button = state.add.button(0, (50 * index), state.cache.getBitmapData('button'));
-        var baseY = 90;
-        if(index == 0 )
-          baseY = 90;
-        else 
-          baseY = 90 + (80 * index);
-        button = createRectangle(15, baseY, 180, 60, 0xf54296, 1);
-        button.icon = state.add.image(21, baseY + 6, buttonData.icon).setOrigin(0,0);
-        button.text = state.add.text(57, baseY + 6, buttonData.name + ': ' + buttonData.level, {font: '16px Arial Black'}).setOrigin(0,0);
-        button.details = buttonData;
-        button.costText = state.add.text(57, baseY + 24, 'Cost: ' + buttonData.cost, {font: '16px Arial Black'});
-        // button.events.onInputDown.add(onUpgradeButtonClick, state);
-        button.on('pointerdown', function() { onUpgradeButtonClick(this) })
-    });
+  var createMenu = function() {
+		var scrollMode = 0; // 0:vertical, 1:horizontal
+		state.gridTable = state.rexUI.add.gridTable({
+			x: 0,
+			y: 640,
+			width: 540,
+			height: 960/3,
+
+			scrollMode: scrollMode,
+
+			background: state.rexUI.add.roundRectangle(0, 0, 20, 10, 10, COLOR_PRIMARY),
+
+			table: {
+				cellWidth: (scrollMode === 0) ? undefined : 60,
+				cellHeight: (scrollMode === 0) ? 60 : undefined,
+
+				columns: 1,
+
+				mask: {
+					padding: 2,
+				},
+
+				reuseCellContainer: false,
+			},
+
+			// slider: {
+			// 	track: state.rexUI.add.roundRectangle(0, 0, 20, 10, 10, COLOR_DARK),
+			// 	thumb: state.rexUI.add.roundRectangle(0, 0, 0, 0, 13, COLOR_LIGHT),
+			// },
+			slider: false,
+
+			header: state.rexUI.add.label({
+				width: undefined,
+				height: 30,
+
+				orientation: scrollMode,
+				background: state.rexUI.add.roundRectangle(0, 0, 20, 20, 10, COLOR_DARK),
+				text: state.add.text(0, 0, 'Upgrades'),
+			}),
+
+			space: {
+				left: 20,
+				right: 20,
+				top: 20,
+				bottom: 20,
+
+				header: 10,
+
+				table: 10,
+			},
+
+			createCellContainerCallback: function (cell, cellContainer) {
+        
+				var scene = cell.scene,
+					width = cell.width,
+					height = cell.height,
+					item = cell.item,
+					index = cell.index;
+				if (cellContainer === null) {
+					cellContainer = scene.rexUI.add.label({
+						width: width,
+						height: height,
+
+						orientation: scrollMode,
+						background: scene.rexUI.add.roundRectangle(0, 0, 20, 20, 2).setStrokeStyle(2, COLOR_DARK),
+            // icon: scene.rexUI.add.roundRectangle(0, 0, 20, 20, 10, 0x0),
+            icon: scene.add.image(0,0, item.icon),
+            text: scene.add.text(0, 0, ''),
+
+						// inside-cell spacing
+						space: {
+							icon: 10,
+							left: 15,
+							top: 0,
+						}
+          });
+        }
+
+        // Set properties from item value
+        // console.log(cellContainer)
+				cellContainer.setMinSize(width, height); // Size might changed in state demo
+				cellContainer.getElement('text').setText(`${item.name}: ${item.level}\n${item.costText}`); // Set text of text object
+        // cellContainer.getElement('icon').setFillStyle(0x0); // Set fill color of round rectangle object
+        return cellContainer;
+			},
+			items: upgradeButtonsData.filter(function(e){return e.isVisible == true})
+		}).setOrigin(0,0)
+			.layout()
+				//.drawBounds(state.add.graphics(), 0xff0000);
+
+		state.gridTable
+		.on('cell.click', function (cellContainer, cellIndex) {
+      onUpgradeClick(cellIndex)
+      state.gridTable.refresh();
+		}, state)
+	}
+  createMenu();
+  function recreateMenu(){
+    state.gridTable.setItems(upgradeButtonsData.filter(function(e){return e.isVisible == true}))
   }
 
   var createUi = function(){
-    this.menuUIO = createRectangle(3, 68, 204, 704, 0x0, 1)
-    this.menuUi = createRectangle(5, 70, 200, 700, 0x9a783d, 1)
     
-    createUpgrades();
   
     // playerInfo background
-    state.playerInfoBG = createRectangle(0,0,state.sys.game.config.width, 30, 0x42f58a, 0.8)
+    state.playerInfoBG = createRectangle(0,0,state.sys.game.config.width, 50, 0x42f58a, 0.8)
       // player info
-    state.playerInfoUI = state.add.group();
-    state.playerGold = state.add.text(0, 3, `Gold: ${state.player.gold}`, {
-      font: '20px Arial Black',
+    state.playerGold = state.add.text(0, 8, `Gold: ${state.player.gold}`, {
+      font: '32px Arial Black',
       fill: '#fff',
     } )
+    
+    state.worldLevelUI = state.add.text(state.sys.game.config.width / 2, 60, `Level: ${state.world.level}`, {
+      font: '28px Arial Black',
+      fill: '#fff'
+    }).setOrigin(0.5, 0.5)
+    state.worldProgressUI = state.add.text(state.sys.game.config.width / 2, 90, `Killed: ${state.world.killed}/${state.world.toKill}`, {
+      font: '28px Arial Black',
+      fill: '#fff'
+    }).setOrigin(0.5, 0.5)
   
     // end of player info
   
     // monster
     state.monsterInfoUI = state.add.group();
-    state.monsterNameTxt = state.add.text(state.currentMonster.x - 32, state.currentMonster.y + 320, state.currentMonster.details.name, {
+    state.monsterNameTxt = state.add.text(state.currentMonster.x , state.currentMonster.y + 200, state.currentMonster.details.name, {
       font: '40px Arial Black',
       fill: '#fff',
       strokeThickness: 3
     }).setOrigin(0.5, 0.5)
     state.monsterNameText = state.monsterInfoUI.add(state.monsterNameTxt);
     
-    state.monsterHPText = state.add.text(state.currentMonster.x - 32, state.currentMonster.y + 380, state.currentMonster.health + ' HP', {
+    state.monsterHPText = state.add.text(state.currentMonster.x , state.currentMonster.y + 260, numFormat(state.currentMonster.health) + ' HP', {
       font: '32px Arial Black',
       fill: '#ff0000',
       strokeThickness: 4
@@ -378,10 +682,21 @@ function create() {
 
   
 
+  function saveGame() {
+    localStorage.setItem('player', JSON.stringify(state.player))
+    localStorage.setItem('world', JSON.stringify(state.world))
+    localStorage.setItem('upgrades', JSON.stringify(upgradeButtonsData))
+  }
   
   
+  var savingTimer = this.time.addEvent({delay: 1000, callback: saveGame, callbackScope: this, loop: true})
+  
+  
+  window.loadGame = loadGame;
+  window.saveGame = saveGame;
 
 }
+
 
 
 
@@ -415,3 +730,23 @@ var app = {
 };
 
 app.initialize();
+
+function numFormat(num, digits = 2) {
+  var si = [
+    { value: 1, symbol: "" },
+    { value: 1E3, symbol: "k" },
+    { value: 1E6, symbol: "M" },
+    { value: 1E9, symbol: "G" },
+    { value: 1E12, symbol: "T" },
+    { value: 1E15, symbol: "P" },
+    { value: 1E18, symbol: "E" }
+  ];
+  var rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+  var i;
+  for (i = si.length - 1; i > 0; i--) {
+    if (num >= si[i].value) {
+      break;
+    }
+  }
+  return (num / si[i].value).toFixed(digits).replace(rx, "$1") + si[i].symbol;
+}
